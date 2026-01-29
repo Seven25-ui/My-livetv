@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Se7en | Pinoy Elite TV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff0000;
+            --bg-color: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-color: #ffffff;
+            --accent-color: #222;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 30px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, #1a1a1a, transparent);
+        }
+
+        .brand {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            color: var(--primary-color);
+            letter-spacing: 5px;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        #channelSearch {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        #channelSearch:focus { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
+
+        .main-player {
+            width: 95%;
+            max-width: 900px;
+            margin: 0 auto 30px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 1px solid #333;
+            background: #000;
+        }
+
+        video { width: 100%; aspect-ratio: 16/9; display: block; }
+
+        .container { padding: 0 20px 50px 20px; max-width: 1200px; margin: auto; }
+
+        .category-title {
+            margin: 30px 0 15px;
+            font-weight: 600;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .channel-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #222;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        .channel-card:hover {
+            background: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+            border-color: transparent;
+        }
+
+        .channel-card p {
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1.2;
+            word-wrap: break-word;
+        }
+
+        #loading, #loadingSports { text-align: center; color: var(--primary-color); font-size: 0.8rem; margin: 10px; }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">SE7EN</div>
+        <p style="color: #666; font-size: 0.8rem; margin-top: 10px;">ELITE PHILIPPINES IPTV</p>
+    </header>
+
+    <div class="main-player">
+        <video id="videoPlayer" controls autoplay poster="https://via.placeholder.com/800x450/111/fff?text=PINOY+ELITE+TV"></video>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="channelSearch" placeholder="Search channels..." onkeyup="filterChannels()">
+    </div>
+
+    <div class="container">
+        <h2 class="category-title">🔥 ELITE SELECTIONS</h2>
+        <div class="grid" id="featuredGrid">
+            <div class="channel-card" onclick="playVideo('http://tbtv.me:2095/play/live.php?mac=00:1A:79:E7:32:0C&stream=186540&extension=m3u8')">
+                <p>🏀 LIVE CHANNEL 1</p>
+            </div>
+            <div class="channel-card" onclick="playVideo('https://edge.pldt.u-stream.tv/live/untv/playlist.m3u8')">
+                <p>🛡️ UNTV NEWS</p>
+            </div>
+            <div class="channel-card" onclick="playVideo('https://sportsgrid-klowdtv.amagi.tv/playlist.m3u8')">
+                <p>🏀 NBA NEWS & STATS</p>
+            </div>
+            <div class="channel-card" onclick="playVideo('https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8')">
+                <p>🎥 CINEMO BACKUP</p>
+            </div>
+        </div>
+
+        <h2 class="category-title">🏆 GLOBAL SPORTS LIVE</h2>
+        <div id="loadingSports">Fetching Global Sports...</div>
+        <div class="grid" id="sportsGrid"></div>
+
+        <h2 class="category-title">🇵🇭 PHILIPPINE TV LIST</h2>
+        <div id="loading">Fetching Pinoy Channels...</div>
+        <div class="grid" id="phGrid"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        let hls = new Hls();
+        const phGrid = document.getElementById('phGrid');
+        const sportsGrid = document.getElementById('sportsGrid');
+
+        function playVideo(url) {
+            const video = document.getElementById('videoPlayer');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (Hls.isSupported()) {
+                hls.destroy();
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.play();
+            }
+        }
+
+        // AUTO LOAD SPORTS FROM INDEX.M3U
+        async function loadSportsChannels() {
+            const sportsUrl = 'https://iptv-org.github.io/iptv/index.m3u';
+            try {
+                const response = await fetch(sportsUrl);
+                const data = await response.text();
+                const lines = data.split('\n');
+                document.getElementById('loadingSports').style.display = 'none';
+
+                let currentName = '';
+                let count = 0;
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if (line.startsWith('#EXTINF')) {
+                        currentName = line.split(',')[1] || 'Sports Channel';
+                    } else if (line.startsWith('http')) {
+                        // FILTER: SPORTS RA GYUD
+                        if (currentName.toLowerCase().includes('sports') || currentName.toLowerCase().includes('nba') || currentName.toLowerCase().includes('football')) {
+                            const card = document.createElement('div');
+                            card.className = 'channel-card';
+                            card.setAttribute('data-name', currentName.toLowerCase());
+                            const streamUrl = line;
+                            card.onclick = () => playVideo(streamUrl);
+                            card.innerHTML = `<p>🏆 ${currentName}</p>`;
+                            sportsGrid.appendChild(card);
+                            count++;
+                        }
+                    }
+                    if (count >= 40) break; // Limit 40 channels para dili bug-at
+                }
+            } catch (e) {
+                document.getElementById('loadingSports').innerText = "Failed to load Sports.";
+            }
+        }
+
+        async function loadPHChannels() {
+            const playlistUrl = 'https://iptv-org.github.io/iptv/countries/ph.m3u';
+            try {
+                const response = await fetch(playlistUrl);
+                const data = await response.text();
+                const lines = data.split('\n');
+                document.getElementById('loading').style.display = 'none';
+
+                let currentName = '';
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (line.startsWith('#EXTINF')) {
+                        currentName = line.split(',')[1] || 'Pinoy Channel';
+                    } else if (line.startsWith('http')) {
+                        const card = document.createElement('div');
+                        card.className = 'channel-card';
+                        card.setAttribute('data-name', currentName.toLowerCase());
+                        const streamUrl = line;
+                        card.onclick = () => playVideo(streamUrl);
+                        card.innerHTML = `<p>${currentName}</p>`;
+                        phGrid.appendChild(card);
+                    }
+                });
+            } catch (e) {
+                document.getElementById('loading').innerText = "Failed to sync channels.";
+            }
+        }
+
+        function filterChannels() {
+            const query = document.getElementById('channelSearch').value.toLowerCase();
+            const allCards = document.querySelectorAll('.channel-card');
+
+            allCards.forEach(card => {
+                const name = card.getAttribute('data-name') || "";
+                card.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        // Sugdan ang pagkarga
+        loadPHChannels();
+        loadSportsChannels();
+    </script>
+</body>
+</html>
