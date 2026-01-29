@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Se7en | Pinoy Elite TV</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #ff0000;
@@ -122,6 +123,50 @@
         @media (max-width: 600px) {
             .grid { grid-template-columns: repeat(2, 1fr); }
         }
+
+footer {
+            padding: 40px 20px;
+            text-align: center;
+            background: #111;
+            border-top: 1px solid #222;
+            margin-top: 50px;
+        }
+
+        .socials {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .socials a {
+            color: #666;
+            font-size: 1.5rem;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .socials a:hover {
+            color: var(--primary-color);
+        }
+
+        footer p {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .credits {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: #444;
+        }
+
+        .credits span {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
     </style>
 </head>
 <body>
@@ -164,6 +209,16 @@
         <div id="loading">Fetching Pinoy Channels...</div>
         <div class="grid" id="phGrid"></div>
     </div>
+
+<footer>
+    <div class="socials">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-github"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+    </div>
+    <p>© 2026 SE7EN LIVETV. All rights reserved.</p>
+    <div class="credits">POWERED BY <span>ALOYGENEX</span></div>
+</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
