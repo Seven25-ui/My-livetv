@@ -8,19 +8,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #ff4500; /* SE7EN Orange [cite: 2026-01-31] */
+            --primary-color: #ff4500; 
             --bg-color: #080808;
             --card-bg: #151515;
             --text-color: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; padding-bottom: 80px; }
 
         header { padding: 40px 20px; text-align: center; background: linear-gradient(to bottom, #111, transparent); }
         .brand { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: var(--primary-color); letter-spacing: 4px; text-shadow: 0 0 15px rgba(255, 69, 0, 0.5); }
 
-        .main-player { width: 100%; max-width: 900px; margin: 0 auto 20px; background: #000; border-bottom: 3px solid var(--primary-color); }
+        .main-player { width: 100%; max-width: 900px; margin: 0 auto 20px; background: #000; border-bottom: 3px solid var(--primary-color); position: sticky; top: 0; z-index: 1000; }
         video { width: 100%; aspect-ratio: 16/9; display: block; }
 
         .search-container { max-width: 500px; margin: 0 auto 30px; padding: 0 20px; }
@@ -34,19 +34,23 @@
         .channel-card:hover { background: var(--primary-color); transform: translateY(-3px); }
         .channel-card p { font-size: 0.75rem; font-weight: bold; }
 
-        .nba-special { background: linear-gradient(45deg, #1d428a, #c8102e); border: none; } /* NBA Colors */
+        .nba-special { background: linear-gradient(45deg, #1d428a, #c8102e); border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        .back-btn { position: fixed; bottom: 20px; left: 20px; background: var(--primary-color); color: white; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 14px; z-index: 2000; box-shadow: 0 4px 15px rgba(255, 69, 0, 0.4); }
 
         @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
 
-        footer { padding: 30px; text-align: center; background: #050505; color: #444; font-size: 0.8rem; border-top: 1px solid #111; }
+        footer { padding: 30px; text-align: center; background: #050505; color: #444; font-size: 0.8rem; border-top: 1px solid #111; margin-top: 20px; }
         .credits span { color: var(--primary-color); font-weight: bold; }
     </style>
 </head>
 <body>
 
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> HOME</a>
+
     <header>
         <div class="brand">SE7EN LIVE</div>
-        <p style="color: #666; font-size: 0.7rem; margin-top: 10px; letter-spacing: 2px;">GLOBAL SPORTS & ENTERTAINMENT</p>
+        <p style="color: #666; font-size: 0.7rem; margin-top: 10px; letter-spacing: 2px;">GLOBAL SPORTS HUB</p>
     </header>
 
     <div class="main-player">
@@ -54,22 +58,25 @@
     </div>
 
     <div class="search-container">
-        <input type="text" id="channelSearch" placeholder="Search NBA, Football, Movies..." onkeyup="filterChannels()">
+        <input type="text" id="channelSearch" placeholder="Search NBA, Sports, Movies..." onkeyup="filterChannels()">
     </div>
 
     <div class="container">
-        <h2 class="category-title">🏀 NBA & MAJOR LEAGUES (PRIORITY)</h2>
+        <h2 class="category-title">🏀 NBA & PREMIUM SPORTS</h2>
         <div class="grid" id="nbaGrid">
-            <div class="channel-card nba-special" onclick="playVideo('https://sportsgrid-klowdtv.amagi.tv/playlist.m3u8')">
+            <div class="channel-card nba-special" onclick="playVideo('https://d35u070iy8p9n3.cloudfront.net/v1/master/927702832968600/NBA-NBA-TV/index.m3u8')">
                 <p>🏀 NBA TV LIVE</p>
             </div>
-            <div class="channel-card nba-special" onclick="playVideo('https://origin.rebellionnetworks.com/live/rebel1/playlist.m3u8')">
-                <p>🏆 SPORTS LIVE 1</p>
+            <div class="channel-card nba-special" onclick="playVideo('https://sportsgrid-klowdtv.amagi.tv/playlist.m3u8')">
+                <p>🏆 NBA NEWS & STATS</p>
+            </div>
+            <div class="channel-card nba-special" onclick="playVideo('https://dai.google.com/linear/hls/event/SidS8lb6T9S3uF6ID9pT6w/master.m3u8')">
+                <p>🏅 GLOBAL SPORTS 1</p>
             </div>
         </div>
 
-        <h2 class="category-title">🌍 GLOBAL SPORTS SELECTION</h2>
-        <div id="loadingSports" style="text-align:center; padding:20px; font-size: 0.8rem;">Searching Global Satellites...</div>
+        <h2 class="category-title">🌍 LIVE GLOBAL SELECTION</h2>
+        <div id="loadingSports" style="text-align:center; padding:20px; font-size: 0.8rem; color: var(--primary-color);">Searching Satellites...</div>
         <div class="grid" id="sportsGrid"></div>
 
         <h2 class="category-title">🎬 GLOBAL ENTERTAINMENT</h2>
@@ -77,12 +84,16 @@
     </div>
 
     <footer>
-        <p>© 2026 SE7EN GLOBAL. POWERED BY <span>ALOYGENEX</span></p>
+        <p>© 2026 SE7EN GLOBAL. ALL RIGHTS RESERVED.</p>
+        <div class="credits">POWERED BY <span>ALOYGENEX</span></div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        let hls = new Hls();
+        let hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true
+        });
         const video = document.getElementById('videoPlayer');
 
         function playVideo(url) {
@@ -92,7 +103,9 @@
                 hls = new Hls();
                 hls.loadSource(url);
                 hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play().catch(() => console.log("Manual play required"));
+                });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.play();
@@ -118,15 +131,15 @@
                     } else if (line.startsWith('http')) {
                         const nameLower = currentName.toLowerCase();
                         
-                        // PRIORITIZE SPORTS & NBA [cite: 2026-01-31]
-                        if (nameLower.includes('nba') || nameLower.includes('sports') || nameLower.includes('espn') || nameLower.includes('bein')) {
-                            if (sportsCount < 30) {
+                        // PRIORITIZE GLOBAL SPORTS [cite: 2026-01-31]
+                        if (nameLower.includes('sports') || nameLower.includes('football') || nameLower.includes('espn')) {
+                            if (sportsCount < 40) {
                                 createCard(currentName, line, 'sportsGrid');
                                 sportsCount++;
                             }
                         } 
-                        // GLOBAL CHANNELS (No PH focus) [cite: 2026-01-31]
-                        else if (nameLower.includes('movie') || nameLower.includes('news') || nameLower.includes('usa') || nameLower.includes('uk')) {
+                        // GLOBAL ENTERTAINMENT (Movies/News) [cite: 2026-01-31]
+                        else if (nameLower.includes('movie') || nameLower.includes('news') || nameLower.includes('cinema')) {
                             if (worldCount < 20) {
                                 createCard(currentName, line, 'worldGrid');
                                 worldCount++;
@@ -135,7 +148,7 @@
                     }
                 }
             } catch (e) {
-                document.getElementById('loadingSports').innerText = "Sync Error. Please Refresh.";
+                document.getElementById('loadingSports').innerText = "Network Busy. Refresh Page.";
             }
         }
 
