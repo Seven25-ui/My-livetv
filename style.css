@@ -1,104 +1,194 @@
+:root {
+    --bg-color: #05080f;
+    --panel-bg: rgba(21, 26, 35, 0.8); /* Semi-transparent para makita ang bg */
+    --text-main: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --border: #30363d;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* --- BACKGROUND ANIMATION SETUP --- */
 body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #0f0f13;
-    color: #e8e8e8;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 40px 20px;
+    position: relative;
+    overflow-x: hidden;
 }
 
+/* 1. Subtle Grid Pattern */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: -2;
+    mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+}
+
+/* 2. Animated Glowing Orbs */
+body::after {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+    top: -100px;
+    left: -100px;
+    z-index: -1;
+    animation: float 10s infinite alternate ease-in-out;
+    border-radius: 50%;
+    filter: blur(60px);
+}
+
+/* Kani nga div ibutang nimo sa HTML (tan-awa sa ubos) */
+.bg-orb-2 {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 60%);
+    bottom: -100px;
+    right: -100px;
+    z-index: -1;
+    animation: float 12s infinite alternate-reverse ease-in-out;
+    border-radius: 50%;
+    filter: blur(80px);
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+/* --- UI STYLING --- */
 header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    z-index: 1;
 }
 
 header h1 {
-    font-size: 1.8rem;
-    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, #8b949e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-    font-size: 0.85rem;
-    color: #888;
-    margin-top: 4px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 8px;
 }
 
 main {
     width: 100%;
-    max-width: 850px;
+    max-width: 900px;
+    z-index: 1; /* Para naa sa ibabaw sa background */
 }
 
+/* Controls (Glassmorphism effect) */
 .controls {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 12px;
+    margin-bottom: 20px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     flex-wrap: wrap;
 }
 
 #channel-select {
     flex: 1;
-    min-width: 200px;
-    padding: 10px 12px;
+    min-width: 250px;
+    padding: 12px 16px;
     font-size: 15px;
+    font-family: inherit;
     border-radius: 8px;
-    border: 1px solid #333;
-    background: #1c1c22;
-    color: #e8e8e8;
+    border: 1px solid var(--border);
+    background-color: rgba(13, 17, 23, 0.8);
+    color: var(--text-main);
     outline: none;
     cursor: pointer;
+    transition: all 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238b949e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px top 50%;
+    background-size: 12px auto;
 }
 
 #channel-select:focus {
-    border-color: #4a9eff;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 button {
-    padding: 10px 18px;
+    padding: 12px 20px;
     font-size: 15px;
     font-weight: 600;
+    font-family: inherit;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 #play-btn {
-    background: #4a9eff;
+    background: var(--accent);
     color: #fff;
 }
 
 #play-btn:hover {
-    background: #2e7fd9;
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 #stop-btn {
-    background: #2a2a33;
-    color: #ccc;
+    background: rgba(33, 38, 45, 0.8);
+    color: var(--text-main);
+    border: 1px solid var(--border);
 }
 
 #stop-btn:hover {
-    background: #3a3a45;
+    background: #30363d;
+    border-color: #8b949e;
 }
 
-button:active {
-    transform: scale(0.97);
-}
-
+/* Video Container */
 #video-container {
     width: 100%;
     background: #000;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     aspect-ratio: 16 / 9;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    position: relative;
 }
 
 #video {
@@ -109,17 +199,22 @@ button:active {
 }
 
 #status {
-    margin-top: 12px;
+    margin-top: 20px;
     font-size: 0.9rem;
-    color: #8a8a95;
+    color: var(--text-muted);
     text-align: center;
-    min-height: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 30px;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 footer {
-    margin-top: 30px;
-    font-size: 0.75rem;
-    color: #555;
+    margin-top: auto;
+    padding-top: 40px;
+    font-size: 0.8rem;
+    color: #484f58;
     text-align: center;
-    max-width: 600px;
+    z-index: 1;
 }
