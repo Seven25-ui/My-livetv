@@ -1,16 +1,24 @@
 // === Configuration: Multiple Sources ===
 const PLAYLISTS = {
     ph: {
-        name: "Philippines (iptv-org)",
+        name: "Philippines",
         url: "https://iptv-org.github.io/iptv/countries/ph.m3u"
     },
     global: {
-        name: "Global (iptv-org)",
+        name: "Global (All)",
         url: "https://iptv-org.github.io/iptv/index.m3u"
     },
     global_news: {
-        name: "Global News (iptv-org)",
+        name: "Global News",
         url: "https://iptv-org.github.io/iptv/categories/news.m3u"
+    },
+    global_sports: {
+        name: "Global Sports",
+        url: "https://iptv-org.github.io/iptv/categories/sports.m3u"
+    },
+    global_movies: {
+        name: "Global Movies",
+        url: "https://iptv-org.github.io/iptv/categories/movies.m3u"
     }
 };
 
