@@ -27,6 +27,7 @@ body {
     overflow-x: hidden;
 }
 
+/* --- BACKGROUND ANIMATION SETUP --- */
 body::before {
     content: '';
     position: absolute;
@@ -72,6 +73,7 @@ body::after {
     100% { transform: translate(50px, 50px) scale(1.1); }
 }
 
+/* --- UI STYLING --- */
 header {
     text-align: center;
     margin-bottom: 30px;
@@ -99,6 +101,7 @@ main {
     z-index: 1;
 }
 
+/* --- CONTROLS & DROPDOWNS --- */
 .controls {
     display: flex;
     gap: 12px;
@@ -113,9 +116,11 @@ main {
     flex-wrap: wrap;
 }
 
+/* Custom Select Dropdowns (Parehas og style ang duha) */
+#source-select, 
 #channel-select {
     flex: 1;
-    min-width: 250px;
+    min-width: 200px;
     padding: 12px 16px;
     font-size: 15px;
     font-family: inherit;
@@ -133,11 +138,19 @@ main {
     background-size: 12px auto;
 }
 
+/* Mas gamay og space ang Source dropdown kaysa Channel dropdown */
+#source-select {
+    flex: 0.6; 
+    min-width: 160px;
+}
+
+#source-select:focus, 
 #channel-select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
+/* --- BUTTONS --- */
 button {
     padding: 12px 20px;
     font-size: 15px;
@@ -174,6 +187,7 @@ button {
     border-color: #8b949e;
 }
 
+/* --- VIDEO PLAYER --- */
 #video-container {
     width: 100%;
     background: #000;
@@ -191,6 +205,7 @@ button {
     background: #000;
 }
 
+/* --- STATUS & FOOTER --- */
 #status {
     margin-top: 20px;
     font-size: 0.9rem;
@@ -201,6 +216,7 @@ button {
     border-radius: 30px;
     display: inline-block;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: color 0.3s ease;
 }
 
 footer {
@@ -210,4 +226,20 @@ footer {
     color: #484f58;
     text-align: center;
     z-index: 1;
+}
+
+/* --- RESPONSIVE PARA SA MOBILE --- */
+@media (max-width: 600px) {
+    .controls {
+        flex-direction: column;
+    }
+    #source-select, 
+    #channel-select,
+    button {
+        width: 100%;
+        flex: none;
+    }
+    header h1 {
+        font-size: 1.8rem;
+    }
 }
