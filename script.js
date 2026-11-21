@@ -17,7 +17,7 @@ function setStatus(msg) {
     statusEl.textContent = msg;
 }
 
-// === Load ug parse sa M3U playlist ===
+// === Load and parse M3U playlist ===
 async function loadPlaylist() {
     try {
         const response = await fetch(PLAYLIST_URL);
@@ -31,7 +31,6 @@ async function loadPlaylist() {
             line = line.trim();
 
             if (line.startsWith('#EXTINF:')) {
-                // Ang channel name naa after sa last comma
                 const parts = line.split(',');
                 if (parts.length > 1) {
                     currentName = parts[parts.length - 1].trim();
@@ -43,18 +42,17 @@ async function loadPlaylist() {
         });
 
         populateDropdown();
-        setStatus(`Naka-load ${channels.length} channels. Pili og channel ug pindota ang Play.`);
+        setStatus(`Loaded ${channels.length} channels. Select a channel and click Play.`);
     } catch (error) {
         setStatus('❌ Error loading playlist: ' + error.message);
         console.error(error);
     }
 }
 
-// === Populate ang dropdown ===
+// === Populate dropdown ===
 function populateDropdown() {
-    channelSelect.innerHTML = '<option value="">-- Pili og Channel --</option>';
+    channelSelect.innerHTML = '<option value="">-- Select a Channel --</option>';
 
-    // Sort alphabetically para mas organized
     channels.sort((a, b) => a.name.localeCompare(b.name));
 
     channels.forEach((ch, index) => {
@@ -65,9 +63,8 @@ function populateDropdown() {
     });
 }
 
-// === Play ang selected stream ===
+// === Play selected stream ===
 function playStream(url, name) {
-    // Clear previous instance
     if (hls) {
         hls.destroy();
         hls = null;
@@ -75,7 +72,7 @@ function playStream(url, name) {
     video.removeAttribute('src');
     video.load();
 
-    setStatus('⏳ Nag-load sa stream...');
+    setStatus('⏳ Loading stream...');
 
     if (Hls.isSupported()) {
         hls = new Hls({
@@ -87,24 +84,24 @@ function playStream(url, name) {
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
             video.play().catch(() => {
-                setStatus('▶ Pindota ang play button sa video.');
+                setStatus('▶ Click the play button on the video.');
             });
-            setStatus(`▶ Nag-play: ${name}`);
+            setStatus(`▶ Now Playing: ${name}`);
         });
 
         hls.on(Hls.Events.ERROR, (event, data) => {
             if (data.fatal) {
                 switch (data.type) {
                     case Hls.ErrorTypes.NETWORK_ERROR:
-                        setStatus('⚠️ Network error. Sulayi lain nga channel.');
+                        setStatus('⚠️ Network error. Please try another channel.');
                         hls.startLoad();
                         break;
                     case Hls.ErrorTypes.MEDIA_ERROR:
-                        setStatus('⚠️ Media error. Sulayi lain nga channel.');
+                        setStatus('⚠️ Media error. Please try another channel.');
                         hls.recoverMediaError();
                         break;
                     default:
-                        setStatus('❌ Dili ma-play ang stream. Sulayi lain.');
+                        setStatus('❌ Failed to play stream. Try another one.');
                         hls.destroy();
                         hls = null;
                         break;
@@ -112,18 +109,17 @@ function playStream(url, name) {
             }
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // Native HLS (Safari)
         video.src = url;
         video.addEventListener('loadedmetadata', () => {
             video.play();
-            setStatus(`▶ Nag-play: ${name}`);
+            setStatus(`▶ Now Playing: ${name}`);
         }, { once: true });
     } else {
-        setStatus('❌ Dili supported ang HLS sa imong browser.');
+        setStatus('❌ HLS is not supported in your browser.');
     }
 }
 
-// === Stop ang playback ===
+// === Stop playback ===
 function stopStream() {
     if (hls) {
         hls.destroy();
@@ -132,14 +128,14 @@ function stopStream() {
     video.pause();
     video.removeAttribute('src');
     video.load();
-    setStatus('⏹ Naka-stop.');
+    setStatus('⏹ Stopped.');
 }
 
 // === Event listeners ===
 playBtn.addEventListener('click', () => {
     const index = channelSelect.value;
     if (index === '') {
-        setStatus('Palihog pili og channel una.');
+        setStatus('Please select a channel first.');
         return;
     }
     const ch = channels[index];
@@ -148,7 +144,6 @@ playBtn.addEventListener('click', () => {
 
 stopBtn.addEventListener('click', stopStream);
 
-// Auto-play kung mag-change og channel samtang nag-play
 channelSelect.addEventListener('change', () => {
     if (hls && channelSelect.value !== '') {
         const ch = channels[channelSelect.value];
