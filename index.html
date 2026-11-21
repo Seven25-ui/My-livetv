@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Philippine Free TV | Live Stream</title>
+    <title>Free Live TV | Global & PH Streams</title>
     <link rel="stylesheet" href="style.css">
     <!-- HLS.js for .m3u8 stream playback -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -14,15 +14,26 @@
     <div class="bg-orb-2"></div>
 
     <header>
-        <h1>📺 Philippine Free TV</h1>
-        <p class="subtitle">Free live channels — for personal use only</p>
+        <h1>📺 Free Live TV</h1>
+        <p class="subtitle">Watch live channels from the Philippines and around the world</p>
     </header>
 
     <main>
         <div class="controls">
+            <!-- Bag-ong Dropdown para sa Source -->
+            <select id="source-select">
+                <option value="ph">🇵🇭 Philippines</option>
+                <option value="global">🌍 Global (All)</option>
+                <option value="global_news">📰 Global News</option>
+                <option value="global_sports">⚽ Global Sports</option>
+                <option value="global_movies">🎬 Global Movies</option>
+            </select>
+
+            <!-- Dropdown para sa Channels -->
             <select id="channel-select">
                 <option value="">-- Loading channels... --</option>
             </select>
+
             <button id="play-btn">▶ Play</button>
             <button id="stop-btn">⏹ Stop</button>
         </div>
