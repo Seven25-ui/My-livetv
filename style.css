@@ -1,6 +1,6 @@
 :root {
     --bg-color: #05080f;
-    --panel-bg: rgba(21, 26, 35, 0.8); /* Semi-transparent para makita ang bg */
+    --panel-bg: rgba(21, 26, 35, 0.8);
     --text-main: #e6edf3;
     --text-muted: #8b949e;
     --accent: #3b82f6;
@@ -14,7 +14,6 @@
     box-sizing: border-box;
 }
 
-/* --- BACKGROUND ANIMATION SETUP --- */
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg-color);
@@ -28,7 +27,6 @@ body {
     overflow-x: hidden;
 }
 
-/* 1. Subtle Grid Pattern */
 body::before {
     content: '';
     position: absolute;
@@ -42,7 +40,6 @@ body::before {
     -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
 }
 
-/* 2. Animated Glowing Orbs */
 body::after {
     content: '';
     position: absolute;
@@ -57,7 +54,6 @@ body::after {
     filter: blur(60px);
 }
 
-/* Kani nga div ibutang nimo sa HTML (tan-awa sa ubos) */
 .bg-orb-2 {
     position: absolute;
     width: 500px;
@@ -76,7 +72,6 @@ body::after {
     100% { transform: translate(50px, 50px) scale(1.1); }
 }
 
-/* --- UI STYLING --- */
 header {
     text-align: center;
     margin-bottom: 30px;
@@ -101,10 +96,9 @@ header h1 {
 main {
     width: 100%;
     max-width: 900px;
-    z-index: 1; /* Para naa sa ibabaw sa background */
+    z-index: 1;
 }
 
-/* Controls (Glassmorphism effect) */
 .controls {
     display: flex;
     gap: 12px;
@@ -180,7 +174,6 @@ button {
     border-color: #8b949e;
 }
 
-/* Video Container */
 #video-container {
     width: 100%;
     background: #000;
