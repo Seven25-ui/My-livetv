@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Live TV | Global & PH Streams</title>
+    
+    <!-- SVG Favicon (TV Icon nga blue) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='7' width='20' height='15' rx='2' ry='2'%3E%3C/rect%3E%3Cpolyline points='17 2 12 7 7 2'%3E%3C/polyline%3E%3C/svg%3E">
+    
     <link rel="stylesheet" href="style.css">
     <!-- HLS.js for .m3u8 stream playback -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -20,8 +24,8 @@
 
     <main>
         <div class="controls">
-            <!-- Bag-ong Dropdown para sa Source -->
-            <select id="source-select">
+            <!-- Source Dropdown -->
+            <select id="source-select" aria-label="Select Playlist Source">
                 <option value="ph">🇵🇭 Philippines</option>
                 <option value="global">🌍 Global (All)</option>
                 <option value="global_news">📰 Global News</option>
@@ -29,13 +33,14 @@
                 <option value="global_movies">🎬 Global Movies</option>
             </select>
 
-            <!-- Dropdown para sa Channels -->
-            <select id="channel-select">
+            <!-- Channel Dropdown -->
+            <select id="channel-select" aria-label="Select a Channel">
                 <option value="">-- Loading channels... --</option>
             </select>
 
-            <button id="play-btn">▶ Play</button>
-            <button id="stop-btn">⏹ Stop</button>
+            <!-- Control Buttons -->
+            <button id="play-btn" aria-label="Play selected channel">▶ Play</button>
+            <button id="stop-btn" aria-label="Stop playback">⏹ Stop</button>
         </div>
 
         <div id="video-container">
