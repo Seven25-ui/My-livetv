@@ -1,11 +1,11 @@
 :root {
     --bg-color: #05080f;
-    --panel-bg: rgba(21, 26, 35, 0.8);
+    --panel-bg: rgba(18, 22, 31, 0.85);
     --text-main: #e6edf3;
     --text-muted: #8b949e;
     --accent: #3b82f6;
     --accent-hover: #2563eb;
-    --border: #30363d;
+    --border: rgba(255, 255, 255, 0.1);
 }
 
 * {
@@ -22,27 +22,26 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
+    padding: 30px 20px;
     position: relative;
     overflow-x: hidden;
 }
 
-/* --- BACKGROUND ANIMATION SETUP --- */
+/* --- BACKGROUND ANIMATION --- */
 body::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
     z-index: -2;
-    mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
-    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+    mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
 }
 
-body::after {
-    content: '';
+.bg-orb-1 {
     position: absolute;
     width: 600px;
     height: 600px;
@@ -50,9 +49,9 @@ body::after {
     top: -100px;
     left: -100px;
     z-index: -1;
-    animation: float 10s infinite alternate ease-in-out;
+    animation: float 12s infinite alternate ease-in-out;
     border-radius: 50%;
-    filter: blur(60px);
+    filter: blur(80px);
 }
 
 .bg-orb-2 {
@@ -63,17 +62,17 @@ body::after {
     bottom: -100px;
     right: -100px;
     z-index: -1;
-    animation: float 12s infinite alternate-reverse ease-in-out;
+    animation: float 15s infinite alternate-reverse ease-in-out;
     border-radius: 50%;
     filter: blur(80px);
 }
 
 @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(50px, 50px) scale(1.1); }
+    100% { transform: translate(50px, 50px) scale(1.2); }
 }
 
-/* --- UI STYLING --- */
+/* --- HEADER --- */
 header {
     text-align: center;
     margin-bottom: 30px;
@@ -81,67 +80,114 @@ header {
 }
 
 header h1 {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     font-weight: 800;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #fff 0%, #8b949e 100%);
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--text-muted);
-    margin-top: 8px;
+    margin-top: 5px;
 }
 
+/* --- MAIN LAYOUT --- */
 main {
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* --- CONTROLS & DROPDOWNS --- */
+.video-wrapper {
+    width: 100%;
+    position: relative;
+}
+
+/* --- VIDEO PLAYER --- */
+#video-container {
+    width: 100%;
+    background: #000;
+    border-radius: 16px 16px 0 0; /* Flat ang ilawom para motapot sa controls */
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--border);
+    border-bottom: none;
+}
+
+#video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #000;
+    outline: none;
+}
+
+/* --- PREMIUM CONTROL BAR --- */
 .controls {
     display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
     background: var(--panel-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 15px 20px;
+    border-radius: 0 0 16px 16px; /* Flat ang ibabaw para motapot sa video */
+    border: 1px solid var(--border);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     flex-wrap: wrap;
 }
 
-/* Custom Select Dropdowns (Parehas og style ang duha) */
+.dropdown-group {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* --- DROPDOWNS --- */
 #source-select, 
 #channel-select {
     flex: 1;
-    min-width: 200px;
     padding: 12px 16px;
-    font-size: 15px;
+    font-size: 14px;
+    font-weight: 500;
     font-family: inherit;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background-color: rgba(13, 17, 23, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: rgba(0, 0, 0, 0.4);
     color: var(--text-main);
     outline: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     appearance: none;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238b949e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
-    background-position: right 16px top 50%;
-    background-size: 12px auto;
+    background-position: right 14px top 50%;
+    background-size: 10px auto;
 }
 
-/* Mas gamay og space ang Source dropdown kaysa Channel dropdown */
 #source-select {
-    flex: 0.6; 
-    min-width: 160px;
+    flex: 0.4;
+}
+
+#source-select:hover, 
+#channel-select:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 #source-select:focus, 
@@ -152,8 +198,8 @@ main {
 
 /* --- BUTTONS --- */
 button {
-    padding: 12px 20px;
-    font-size: 15px;
+    padding: 12px 24px;
+    font-size: 14px;
     font-weight: 600;
     font-family: inherit;
     border: none;
@@ -162,61 +208,50 @@ button {
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
 }
 
 #play-btn {
     background: var(--accent);
     color: #fff;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
 }
 
 #play-btn:hover {
     background: var(--accent-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 #stop-btn {
-    background: rgba(33, 38, 45, 0.8);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-main);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #stop-btn:hover {
-    background: #30363d;
-    border-color: #8b949e;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* --- VIDEO PLAYER --- */
-#video-container {
-    width: 100%;
-    background: #000;
-    border-radius: 16px;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
-    position: relative;
-}
-
-#video {
-    width: 100%;
-    height: 100%;
-    display: block;
-    background: #000;
-}
-
-/* --- STATUS & FOOTER --- */
-#status {
+/* --- STATUS BAR --- */
+.status-wrapper {
     margin-top: 20px;
+    text-align: center;
+    width: 100%;
+}
+
+#status {
     font-size: 0.9rem;
     color: var(--text-muted);
-    text-align: center;
-    padding: 10px 20px;
+    padding: 10px 24px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 30px;
     display: inline-block;
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: color 0.3s ease;
+    backdrop-filter: blur(10px);
 }
 
 footer {
@@ -229,8 +264,14 @@ footer {
 }
 
 /* --- RESPONSIVE PARA SA MOBILE --- */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .controls {
+        flex-direction: column;
+        border-radius: 0 0 16px 16px;
+    }
+    .dropdown-group, 
+    .button-group {
+        width: 100%;
         flex-direction: column;
     }
     #source-select, 
@@ -240,6 +281,6 @@ footer {
         flex: none;
     }
     header h1 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
 }
