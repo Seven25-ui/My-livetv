@@ -1,25 +1,10 @@
 // === Configuration: Multiple Sources ===
 const PLAYLISTS = {
-    ph: {
-        name: "Philippines",
-        url: "https://iptv-org.github.io/iptv/countries/ph.m3u"
-    },
-    global: {
-        name: "Global (All)",
-        url: "https://iptv-org.github.io/iptv/index.m3u"
-    },
-    global_news: {
-        name: "Global News",
-        url: "https://iptv-org.github.io/iptv/categories/news.m3u"
-    },
-    global_sports: {
-        name: "Global Sports",
-        url: "https://iptv-org.github.io/iptv/categories/sports.m3u"
-    },
-    global_movies: {
-        name: "Global Movies",
-        url: "https://iptv-org.github.io/iptv/categories/movies.m3u"
-    }
+    ph: { name: "Philippines", url: "https://iptv-org.github.io/iptv/countries/ph.m3u" },
+    global: { name: "Global (All)", url: "https://iptv-org.github.io/iptv/index.m3u" },
+    global_news: { name: "Global News", url: "https://iptv-org.github.io/iptv/categories/news.m3u" },
+    global_sports: { name: "Global Sports", url: "https://iptv-org.github.io/iptv/categories/sports.m3u" },
+    global_movies: { name: "Global Movies", url: "https://iptv-org.github.io/iptv/categories/movies.m3u" }
 };
 
 const channelSelect = document.getElementById('channel-select');
@@ -29,11 +14,19 @@ const stopBtn = document.getElementById('stop-btn');
 const video = document.getElementById('video');
 const statusEl = document.getElementById('status');
 
-let channels = [];
-let hls = null;
+// Search & Favorites Elements
+const searchInput = document.getElementById('search-input');
+const favToggleBtn = document.getElementById('fav-toggle-btn');
+const addFavBtn = document.getElementById('add-fav-btn');
 
-// Helper: Public CORS Proxy para ma-bypass ang HTTP restriction
-// Kini nga proxy kay libre apan usahay hinay.
+let channels = []; // Tanan nga na-load
+let filteredChannels = []; // Para sa search/filter
+let hls = null;
+let showFavoritesOnly = false;
+
+// Favorites Storage
+let favorites = JSON.parse(localStorage.getItem('tvFavorites')) || [];
+
 const CORS_PROXY = 'https://corsproxy.io/?'; 
 
 function setStatus(msg, isError = false) {
@@ -41,7 +34,7 @@ function setStatus(msg, isError = false) {
     statusEl.style.color = isError ? '#ef4444' : '#8b949e';
 }
 
-// === Load Playlist Base sa Gi-pili nga Source ===
+// === Load Playlist ===
 async function loadPlaylist(sourceKey) {
     channelSelect.innerHTML = '<option value="">-- Loading channels... --</option>';
     channels = [];
@@ -72,7 +65,7 @@ async function loadPlaylist(sourceKey) {
             }
         });
 
-        populateDropdown();
+        applyFilters(); // I-populate ang dropdown base sa filter
         setStatus(`Loaded ${channels.length} channels from ${playlistInfo.name}.`);
     } catch (error) {
         setStatus('❌ Error loading playlist: ' + error.message, true);
@@ -80,11 +73,24 @@ async function loadPlaylist(sourceKey) {
     }
 }
 
+// === Filter & Populate ===
+function applyFilters() {
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    filteredChannels = channels.filter(ch => {
+        const matchesSearch = ch.name.toLowerCase().includes(searchTerm);
+        const matchesFav = showFavoritesOnly ? favorites.includes(ch.name) : true;
+        return matchesSearch && matchesFav;
+    });
+
+    populateDropdown();
+}
+
 function populateDropdown() {
     channelSelect.innerHTML = '<option value="">-- Select a Channel --</option>';
-    channels.sort((a, b) => a.name.localeCompare(b.name));
+    filteredChannels.sort((a, b) => a.name.localeCompare(b.name));
 
-    channels.forEach((ch, index) => {
+    filteredChannels.forEach((ch, index) => {
         const option = document.createElement('option');
         option.value = index;
         option.textContent = ch.name;
@@ -92,6 +98,7 @@ function populateDropdown() {
     });
 }
 
+// === Play Stream ===
 function playStream(originalUrl, name) {
     if (hls) { hls.destroy(); hls = null; }
     video.removeAttribute('src');
@@ -99,21 +106,19 @@ function playStream(originalUrl, name) {
     setStatus(`⏳ Loading ${name}...`);
 
     let finalUrl = originalUrl;
-
-    // 🔥 MIXED CONTENT FIX: Kung HTTP ang stream ug HTTPS ang site, gamit og proxy
     if (window.location.protocol === 'https:' && originalUrl.startsWith('http:')) {
         finalUrl = CORS_PROXY + encodeURIComponent(originalUrl);
-        setStatus(`⏳ Bypassing HTTP restriction for ${name}...`);
     }
 
     if (Hls.isSupported()) {
         hls = new Hls({ maxBufferLength: 30, enableWorker: true });
-        hls.loadSource(finalUrl); // Gamita ang finalUrl (proxied kung HTTP)
+        hls.loadSource(finalUrl);
         hls.attachMedia(video);
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
             video.play().then(() => {
                 setStatus(`▶ Now Playing: ${name}`);
+                updateFavIcon(name); // Update star icon
             }).catch(() => {
                 setStatus(`▶ Ready: ${name}. Click play on the video.`);
             });
@@ -121,54 +126,83 @@ function playStream(originalUrl, name) {
 
         hls.on(Hls.Events.ERROR, (event, data) => {
             if (data.fatal) {
-                switch (data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                        setStatus(`⚠️ Network error for ${name}. Stream might be offline.`, true);
-                        hls.startLoad();
-                        break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                        setStatus(`⚠️ Media error for ${name}. Trying to recover...`, true);
-                        hls.recoverMediaError();
-                        break;
-                    default:
-                        setStatus(`❌ Failed to play ${name}. Dead link or blocked by proxy.`, true);
-                        hls.destroy(); hls = null;
-                        break;
+                if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                    setStatus(`⚠️ Network error. Try another channel.`, true);
+                    hls.startLoad();
+                } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                    setStatus(`⚠️ Media error. Recovering...`, true);
+                    hls.recoverMediaError();
+                } else {
+                    setStatus(`❌ Failed to play. Dead link.`, true);
+                    hls.destroy(); hls = null;
                 }
             }
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = finalUrl; // Safari native support
+        video.src = finalUrl;
         video.addEventListener('loadedmetadata', () => {
             video.play();
             setStatus(`▶ Now Playing: ${name}`);
+            updateFavIcon(name);
         }, { once: true });
-    } else {
-        setStatus('❌ HLS not supported.', true);
     }
 }
 
-function stopStream() {
+// === Favorites Logic ===
+function updateFavIcon(channelName) {
+    if (favorites.includes(channelName)) {
+        addFavBtn.textContent = '★';
+        addFavBtn.classList.add('active');
+    } else {
+        addFavBtn.textContent = '☆';
+        addFavBtn.classList.remove('active');
+    }
+}
+
+addFavBtn.addEventListener('click', () => {
+    const index = channelSelect.value;
+    if (index === '') return;
+    
+    const chName = filteredChannels[index].name;
+    
+    if (favorites.includes(chName)) {
+        favorites = favorites.filter(f => f !== chName); // Remove
+    } else {
+        favorites.push(chName); // Add
+    }
+    
+    localStorage.setItem('tvFavorites', JSON.stringify(favorites));
+    updateFavIcon(chName);
+});
+
+// === Search & Filter Events ===
+searchInput.addEventListener('input', applyFilters);
+
+favToggleBtn.addEventListener('click', () => {
+    showFavoritesOnly = !showFavoritesOnly;
+    favToggleBtn.classList.toggle('active');
+    applyFilters();
+});
+
+// === Existing Events ===
+playBtn.addEventListener('click', () => {
+    const index = channelSelect.value;
+    if (index === '') { setStatus('Please select a channel first.', true); return; }
+    playStream(filteredChannels[index].url, filteredChannels[index].name);
+});
+
+stopBtn.addEventListener('click', () => {
     if (hls) { hls.destroy(); hls = null; }
     video.pause();
     video.removeAttribute('src');
     video.load();
     setStatus('⏹ Stopped.');
-}
-
-// === Event Listeners ===
-playBtn.addEventListener('click', () => {
-    const index = channelSelect.value;
-    if (index === '') { setStatus('Please select a channel first.', true); return; }
-    const ch = channels[index];
-    playStream(ch.url, ch.name);
 });
-
-stopBtn.addEventListener('click', stopStream);
 
 channelSelect.addEventListener('change', () => {
     if (channelSelect.value !== '') {
-        const ch = channels[channelSelect.value];
+        const ch = filteredChannels[channelSelect.value];
+        updateFavIcon(ch.name);
         playStream(ch.url, ch.name);
     }
 });
