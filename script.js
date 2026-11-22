@@ -23,7 +23,7 @@ const PLAYLISTS = {
 };
 
 const channelSelect = document.getElementById('channel-select');
-const sourceSelect = document.getElementById('source-select'); // Bag-ong dropdown
+const sourceSelect = document.getElementById('source-select');
 const playBtn = document.getElementById('play-btn');
 const stopBtn = document.getElementById('stop-btn');
 const video = document.getElementById('video');
@@ -32,6 +32,10 @@ const statusEl = document.getElementById('status');
 let channels = [];
 let hls = null;
 
+// Helper: Public CORS Proxy para ma-bypass ang HTTP restriction
+// Kini nga proxy kay libre apan usahay hinay.
+const CORS_PROXY = 'https://corsproxy.io/?'; 
+
 function setStatus(msg, isError = false) {
     statusEl.textContent = msg;
     statusEl.style.color = isError ? '#ef4444' : '#8b949e';
@@ -39,7 +43,6 @@ function setStatus(msg, isError = false) {
 
 // === Load Playlist Base sa Gi-pili nga Source ===
 async function loadPlaylist(sourceKey) {
-    // Clear ang existing list
     channelSelect.innerHTML = '<option value="">-- Loading channels... --</option>';
     channels = [];
     
@@ -89,20 +92,23 @@ function populateDropdown() {
     });
 }
 
-function playStream(url, name) {
+function playStream(originalUrl, name) {
     if (hls) { hls.destroy(); hls = null; }
     video.removeAttribute('src');
     video.load();
     setStatus(`⏳ Loading ${name}...`);
 
-    if (window.location.protocol === 'https:' && url.startsWith('http:')) {
-        setStatus(`❌ Cannot play ${name}. Stream is HTTP (Mixed Content).`, true);
-        return;
+    let finalUrl = originalUrl;
+
+    // 🔥 MIXED CONTENT FIX: Kung HTTP ang stream ug HTTPS ang site, gamit og proxy
+    if (window.location.protocol === 'https:' && originalUrl.startsWith('http:')) {
+        finalUrl = CORS_PROXY + encodeURIComponent(originalUrl);
+        setStatus(`⏳ Bypassing HTTP restriction for ${name}...`);
     }
 
     if (Hls.isSupported()) {
         hls = new Hls({ maxBufferLength: 30, enableWorker: true });
-        hls.loadSource(url);
+        hls.loadSource(finalUrl); // Gamita ang finalUrl (proxied kung HTTP)
         hls.attachMedia(video);
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -125,14 +131,14 @@ function playStream(url, name) {
                         hls.recoverMediaError();
                         break;
                     default:
-                        setStatus(`❌ Failed to play ${name}. Dead link.`, true);
+                        setStatus(`❌ Failed to play ${name}. Dead link or blocked by proxy.`, true);
                         hls.destroy(); hls = null;
                         break;
                 }
             }
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
+        video.src = finalUrl; // Safari native support
         video.addEventListener('loadedmetadata', () => {
             video.play();
             setStatus(`▶ Now Playing: ${name}`);
@@ -167,7 +173,6 @@ channelSelect.addEventListener('change', () => {
     }
 });
 
-// Inig-usab sa Source Dropdown, i-reload ang playlist
 if (sourceSelect) {
     sourceSelect.addEventListener('change', (e) => {
         stopStream();
@@ -176,4 +181,4 @@ if (sourceSelect) {
 }
 
 // === Init ===
-loadPlaylist('ph'); // Start sa PH
+loadPlaylist('ph');
