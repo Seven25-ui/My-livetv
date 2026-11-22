@@ -1,10 +1,13 @@
 // === Configuration: Multiple Sources ===
 const PLAYLISTS = {
     ph: { name: "Philippines", url: "https://iptv-org.github.io/iptv/countries/ph.m3u" },
-    global: { name: "Global (All)", url: "https://iptv-org.github.io/iptv/index.m3u" },
     global_news: { name: "Global News", url: "https://iptv-org.github.io/iptv/categories/news.m3u" },
     global_sports: { name: "Global Sports", url: "https://iptv-org.github.io/iptv/categories/sports.m3u" },
-    global_movies: { name: "Global Movies", url: "https://iptv-org.github.io/iptv/categories/movies.m3u" }
+    global_movies: { name: "Global Movies", url: "https://iptv-org.github.io/iptv/categories/movies.m3u" },
+    us: { name: "United States", url: "https://iptv-org.github.io/iptv/countries/us.m3u" },
+    uk: { name: "United Kingdom", url: "https://iptv-org.github.io/iptv/countries/uk.m3u" },
+    ca: { name: "Canada", url: "https://iptv-org.github.io/iptv/countries/ca.m3u" },
+    au: { name: "Australia", url: "https://iptv-org.github.io/iptv/countries/au.m3u" }
 };
 
 const channelSelect = document.getElementById('channel-select');
@@ -27,6 +30,7 @@ let showFavoritesOnly = false;
 // Favorites Storage
 let favorites = JSON.parse(localStorage.getItem('tvFavorites')) || [];
 
+// CORS Proxy para sa HTTP streams
 const CORS_PROXY = 'https://corsproxy.io/?'; 
 
 function setStatus(msg, isError = false) {
@@ -88,7 +92,12 @@ function applyFilters() {
 
 function populateDropdown() {
     channelSelect.innerHTML = '<option value="">-- Select a Channel --</option>';
-    filteredChannels.sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Ayaw i-sort ang filteredChannels directly kay mawala ang index matching
+    const sortedFiltered = [...filteredChannels].sort((a, b) => a.name.localeCompare(b.name));
+    
+    // I-update ang filteredChannels para mo-match sa sorted
+    filteredChannels = sortedFiltered;
 
     filteredChannels.forEach((ch, index) => {
         const option = document.createElement('option');
@@ -118,7 +127,7 @@ function playStream(originalUrl, name) {
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
             video.play().then(() => {
                 setStatus(`▶ Now Playing: ${name}`);
-                updateFavIcon(name); // Update star icon
+                updateFavIcon(name);
             }).catch(() => {
                 setStatus(`▶ Ready: ${name}. Click play on the video.`);
             });
