@@ -1,13 +1,13 @@
 // === Configuration: Multiple Sources ===
 const PLAYLISTS = {
     ph: { name: "Philippines", url: "https://iptv-org.github.io/iptv/countries/ph.m3u" },
-    global_news: { name: "Global News", url: "https://iptv-org.github.io/iptv/categories/news.m3u" },
-    global_sports: { name: "Global Sports", url: "https://iptv-org.github.io/iptv/categories/sports.m3u" },
-    global_movies: { name: "Global Movies", url: "https://iptv-org.github.io/iptv/categories/movies.m3u" },
     us: { name: "United States", url: "https://iptv-org.github.io/iptv/countries/us.m3u" },
     uk: { name: "United Kingdom", url: "https://iptv-org.github.io/iptv/countries/uk.m3u" },
     ca: { name: "Canada", url: "https://iptv-org.github.io/iptv/countries/ca.m3u" },
-    au: { name: "Australia", url: "https://iptv-org.github.io/iptv/countries/au.m3u" }
+    au: { name: "Australia", url: "https://iptv-org.github.io/iptv/countries/au.m3u" },
+    global_news: { name: "Global News", url: "https://iptv-org.github.io/iptv/categories/news.m3u" },
+    global_sports: { name: "Global Sports", url: "https://iptv-org.github.io/iptv/categories/sports.m3u" },
+    global_movies: { name: "Global Movies", url: "https://iptv-org.github.io/iptv/categories/movies.m3u" }
 };
 
 const channelSelect = document.getElementById('channel-select');
@@ -16,26 +16,29 @@ const playBtn = document.getElementById('play-btn');
 const stopBtn = document.getElementById('stop-btn');
 const video = document.getElementById('video');
 const statusEl = document.getElementById('status');
-
-// Search & Favorites Elements
 const searchInput = document.getElementById('search-input');
 const favToggleBtn = document.getElementById('fav-toggle-btn');
 const addFavBtn = document.getElementById('add-fav-btn');
 
-let channels = []; // Tanan nga na-load
-let filteredChannels = []; // Para sa search/filter
+let channels = [];
+let filteredChannels = [];
 let hls = null;
 let showFavoritesOnly = false;
-
-// Favorites Storage
 let favorites = JSON.parse(localStorage.getItem('tvFavorites')) || [];
 
-// CORS Proxy para sa HTTP streams
 const CORS_PROXY = 'https://corsproxy.io/?'; 
 
 function setStatus(msg, isError = false) {
     statusEl.textContent = msg;
     statusEl.style.color = isError ? '#ef4444' : '#8b949e';
+}
+
+// === Stop Stream Function ===
+function stopStream() {
+    if (hls) { hls.destroy(); hls = null; }
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
 }
 
 // === Load Playlist ===
@@ -69,7 +72,7 @@ async function loadPlaylist(sourceKey) {
             }
         });
 
-        applyFilters(); // I-populate ang dropdown base sa filter
+        applyFilters();
         setStatus(`Loaded ${channels.length} channels from ${playlistInfo.name}.`);
     } catch (error) {
         setStatus('❌ Error loading playlist: ' + error.message, true);
@@ -80,23 +83,17 @@ async function loadPlaylist(sourceKey) {
 // === Filter & Populate ===
 function applyFilters() {
     const searchTerm = searchInput.value.toLowerCase();
-    
     filteredChannels = channels.filter(ch => {
         const matchesSearch = ch.name.toLowerCase().includes(searchTerm);
         const matchesFav = showFavoritesOnly ? favorites.includes(ch.name) : true;
         return matchesSearch && matchesFav;
     });
-
     populateDropdown();
 }
 
 function populateDropdown() {
     channelSelect.innerHTML = '<option value="">-- Select a Channel --</option>';
-    
-    // Ayaw i-sort ang filteredChannels directly kay mawala ang index matching
     const sortedFiltered = [...filteredChannels].sort((a, b) => a.name.localeCompare(b.name));
-    
-    // I-update ang filteredChannels para mo-match sa sorted
     filteredChannels = sortedFiltered;
 
     filteredChannels.forEach((ch, index) => {
@@ -109,9 +106,7 @@ function populateDropdown() {
 
 // === Play Stream ===
 function playStream(originalUrl, name) {
-    if (hls) { hls.destroy(); hls = null; }
-    video.removeAttribute('src');
-    video.load();
+    stopStream(); // Tawgon ang stopStream function
     setStatus(`⏳ Loading ${name}...`);
 
     let finalUrl = originalUrl;
@@ -157,7 +152,7 @@ function playStream(originalUrl, name) {
     }
 }
 
-// === Favorites Logic ===
+// === Favorites ===
 function updateFavIcon(channelName) {
     if (favorites.includes(channelName)) {
         addFavBtn.textContent = '★';
@@ -171,20 +166,17 @@ function updateFavIcon(channelName) {
 addFavBtn.addEventListener('click', () => {
     const index = channelSelect.value;
     if (index === '') return;
-    
     const chName = filteredChannels[index].name;
-    
     if (favorites.includes(chName)) {
-        favorites = favorites.filter(f => f !== chName); // Remove
+        favorites = favorites.filter(f => f !== chName);
     } else {
-        favorites.push(chName); // Add
+        favorites.push(chName);
     }
-    
     localStorage.setItem('tvFavorites', JSON.stringify(favorites));
     updateFavIcon(chName);
 });
 
-// === Search & Filter Events ===
+// === EVENTS ===
 searchInput.addEventListener('input', applyFilters);
 
 favToggleBtn.addEventListener('click', () => {
@@ -193,7 +185,6 @@ favToggleBtn.addEventListener('click', () => {
     applyFilters();
 });
 
-// === Existing Events ===
 playBtn.addEventListener('click', () => {
     const index = channelSelect.value;
     if (index === '') { setStatus('Please select a channel first.', true); return; }
@@ -201,10 +192,7 @@ playBtn.addEventListener('click', () => {
 });
 
 stopBtn.addEventListener('click', () => {
-    if (hls) { hls.destroy(); hls = null; }
-    video.pause();
-    video.removeAttribute('src');
-    video.load();
+    stopStream();
     setStatus('⏹ Stopped.');
 });
 
@@ -216,12 +204,12 @@ channelSelect.addEventListener('change', () => {
     }
 });
 
-if (sourceSelect) {
-    sourceSelect.addEventListener('change', (e) => {
-        stopStream();
-        loadPlaylist(e.target.value);
-    });
-}
+// Pina-importante: Ang Event Listener sa Source Selector
+sourceSelect.addEventListener('change', (e) => {
+    console.log("Source changed to:", e.target.value); // Log para makita nimo sa Console
+    stopStream();
+    loadPlaylist(e.target.value);
+});
 
 // === Init ===
 loadPlaylist('ph');
